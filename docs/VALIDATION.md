@@ -21,3 +21,7 @@ Development machine: Apple silicon, macOS 26.6.2, Xcode 26.6 / Swift 6.3.3. Depl
 - Quantitative matching to reference footage. Camera perspective and missing angle traces prevent an exact parameter fit.
 
 The release is a preview. Passing unit and GPU checks does not establish end-to-end latency, physical animation fidelity, or compatibility across hardware.
+
+## 0.1.1 frame pacing
+
+Replaced the live 60 Hz run-loop timer with an NSScreen CADisplayLink and use elapsed time in the preview spring. The live surface requests the screen’s maximum refresh rate; screen capture remains capped at 60 Hz. Duplicate sensor values/statuses no longer trigger SwiftUI publications. This addresses pacing weaknesses identified in code; the reported three-step physical effect has not yet been reproduced or confirmed fixed. Core and GPU checks pass.

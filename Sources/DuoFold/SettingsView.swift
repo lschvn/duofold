@@ -131,7 +131,7 @@ struct SettingsView: View {
             Section("About this recreation") {
                 Text("An independent, open-source macOS interpretation of the iPhone Duo fold. The bottom edge is the hinge. Only the built-in screen is affected.").font(.system(size:13))
                 Text("Requires macOS 14 or later, Metal, and an accessible lid-angle sensor. Sensor support varies by Mac. No account, analytics, or network connection.").font(.system(size:12)).foregroundStyle(.secondary)
-                Link("Animation research and source code",destination:URL(string:"https://github.com/lschvn/duo-animation")!)
+                Link("Animation research and source code",destination:URL(string:"https://github.com/lschvn/duofold")!)
             }
         }.formStyle(.grouped).padding(.horizontal,16)
     }

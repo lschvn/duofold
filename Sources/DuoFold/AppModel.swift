@@ -24,10 +24,11 @@ import FoldCore
     private var overlay: NSPanel?
     private var overlayView: MTKView?
     private var renderer: FoldRenderer?
-    private var timer: Timer?
+    private var displayClock: FoldDisplayClock?
     private var spring = FoldSpring()
     private var previewSpring = FoldSpring()
     private var lastTick = CACurrentMediaTime()
+    private var lastPreviewTick = CACurrentMediaTime()
     private var generation = 0
     private var lastFrame = Date.distantPast
     private var observers: [NSObjectProtocol] = []
@@ -42,10 +43,10 @@ import FoldCore
     init() {
         if let data=UserDefaults.standard.data(forKey:"foldConfiguration"),let saved=try? JSONDecoder().decode(FoldConfiguration.self,from:data) { config=saved }
         sensor.onAngle = { [weak self] angle in
-            guard let self else {return}; self.lidAngle=angle; self.refreshPreview()
+            guard let self else {return}; if self.lidAngle != angle { self.lidAngle=angle; self.refreshPreview() }
         }
         sensor.onStatus = { [weak self] status, available in
-            guard let self else {return}; self.sensorStatus=status; self.sensorAvailable=available
+            guard let self else {return}; if self.sensorStatus != status { self.sensorStatus=status }; if self.sensorAvailable != available { self.sensorAvailable=available }
             if !available && self.enabled { self.disable(reason:status) }
         }
         sensor.start()
@@ -112,7 +113,9 @@ import FoldCore
             else { angle=105-90*(0.5-0.5*cos(t*2*Double.pi)) }
         }
         let target=config.progress(angle:angle)
-        let p=previewSpring.step(target:target,dt:1/60,response:config.response)
+        let now = CACurrentMediaTime(), dt = now - lastPreviewTick
+        lastPreviewTick = now
+        let p=previewSpring.step(target:target,dt:dt,response:config.response)
         previewRenderer?.update(config:config,progress:p)
     }
     func refreshPreview() { previewView?.isPaused=false }
@@ -175,10 +178,8 @@ import FoldCore
                 demoStart=demo ? CACurrentMediaTime() : nil
                 lastFrame=Date()
                 message=demo ? "Desktop demo · restores automatically after five seconds. Escape stops it." : "Following the lid. Escape pauses the effect."
-                let t=Timer(timeInterval:1/60,repeats:true) { [weak self] _ in
-                    MainActor.assumeIsolated {self?.tick()}
-                }
-                timer=t;RunLoop.main.add(t,forMode:.common)
+                displayClock = FoldDisplayClock(screen: screen) { [weak self] in self?.tick() }
+
             } catch {
                 await c.stop()
                 guard generation==token else {return}
@@ -224,7 +225,7 @@ import FoldCore
     func disable(reason: String = "Paused. Your desktop is back to normal.") {
         resumeTask?.cancel();resumeTask=nil;resumeAfterSystemPause=false
         generation+=1;enabled=false;busy=false;demoStart=nil
-        timer?.invalidate();timer=nil;hideOverlay()
+        displayClock?.stop();displayClock=nil;hideOverlay()
         overlay?.close();overlay=nil;overlayView=nil
         renderer?.clear();renderer=nil;spring.reset()
         let c=capture;capture=nil;Task {await c?.stop()}

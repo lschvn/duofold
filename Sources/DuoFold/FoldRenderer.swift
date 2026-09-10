@@ -53,7 +53,7 @@ final class FoldRenderer: NSObject, MTKViewDelegate {
     func configure(view: MTKView) {
         view.device = device; view.colorPixelFormat = .bgra8Unorm
         view.clearColor = MTLClearColorMake(0, 0, 0, 1)
-        view.framebufferOnly = true; view.preferredFramesPerSecond = 60
+        view.framebufferOnly = true; view.preferredFramesPerSecond = NSScreen.main?.maximumFramesPerSecond ?? 60
         view.isPaused = true; view.enableSetNeedsDisplay = false
         view.delegate = self
     }

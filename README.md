@@ -8,7 +8,7 @@ A native macOS menu bar app that bends and progressively defocuses your live des
 
 ## Try it
 
-Download the Apple silicon DMG from [Releases](https://github.com/lschvn/duo-animation/releases), drag DuoFold into Applications, and open it. Enable the effect and grant **Screen Recording** in System Settings when requested. The effect starts disabled. Escape pauses an active fold overlay; settings and Quit are in the menu bar.
+Download the Apple silicon DMG from [Releases](https://github.com/lschvn/duofold/releases), drag DuoFold into Applications, and open it. Enable the effect and grant **Screen Recording** in System Settings when requested. The effect starts disabled. Escape pauses an active fold overlay; settings and Quit are in the menu bar.
 
 This is an **experimental, ad-hoc signed preview**, without Apple notarization. macOS may block the downloaded app; use System Settings → Privacy & Security → Open Anyway if you choose to run it, or build from source. Do not disable Gatekeeper globally.
 
